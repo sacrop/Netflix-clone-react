@@ -1,4 +1,4 @@
-import logo from './logo.svg';
+import { Originals,Action } from './components/constants/Urls';
 import './App.css';
 import Banner from './components/Banner/Banner';
 import Navbar from './components/Navbar/Navbar';
@@ -8,7 +8,8 @@ function App() {
     <>
     <Navbar/>
     <Banner/>
-    <RawPost/>
+    <RawPost url={Originals} titles="Netflix Originals" />
+    <RawPost url={Action} titles="Action" isSmall />
     </>
   );
 }
