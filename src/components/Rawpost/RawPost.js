@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import './RawPost.css'
-import { imageUrl } from '../constants/Constants'
+import YouTube from 'react-youtube'
+import { API_KEY, baseUrl, imageUrl } from '../constants/Constants'
 import axios from 'axios'
 const RawPost = (props) => {
   const [movies, setMovies] = useState([])
+  const [urlId, setUrlId] = useState();
 
   useEffect(() => {
     axios.get(props.url).then((response)=>{
@@ -13,6 +15,28 @@ const RawPost = (props) => {
       console.log(err)
     })
   }, [])
+
+  const opts = {
+    height: '390',
+    width: '100%',
+    playerVars: {
+      // https://developers.google.com/youtube/player_parameters
+      autoplay: 1,
+    },
+  };
+  const handleMovie=(id)=>{
+    axios.get(`${baseUrl}/movie/${id}/videos?api_key=${API_KEY}&language=en-US`).then((response)=>
+    {
+      if(response.data.results.length!==0){
+        setUrlId(response.data.results[0])
+      }
+      else{
+        console.log("vedio currently not available")
+      }
+    }
+    )
+    .catch((error)=>console.log("error occured"+error))
+  } 
   
 
   return (
@@ -21,12 +45,16 @@ const RawPost = (props) => {
         <div className='posters'>
           {
             movies.map((mov)=>{
-              return <img className={props.isSmall?"smallPoster":'poster'} src={`${imageUrl+mov.backdrop_path}`} alt=''/>
+              return (
+                
+                <img key={mov.id} onClick={()=>{handleMovie(mov.id)}} className={props.isSmall?"smallPoster":'poster'} src={`${imageUrl+mov.backdrop_path}`} alt=''/>
+               
+              )
             }
             )
           }
-            <img className='poster'  src='https://images.squarespace-cdn.com/content/v1/59232e19579fb3fa44a693c2/1589212826160-UM9PEPGOS3OJPR0FJ81X/ke17ZwdGBToddI8pDm48kHZUaJeKzodyg_sXWBMxNTdZw-zPPgdn4jUwVcJE1ZvWQUxwkmyExglNqGp0IvTJZUJFbgE-7XRK3dMEBRBhUpxCBUU7B-_SAG1kGvCwYgmUjQXvn8_OJjtz3K1llMQBa1MPsuSXPSY3X-tgg78M7lI/SKOyqL1qFLIhbK6ho2lB-696x975.jpg?format=1500w' alt='poster'/>  
          </div>
+         {urlId && <YouTube videoId={urlId?urlId.key:""}  opts={opts} />}
     </div>
   )
 }
